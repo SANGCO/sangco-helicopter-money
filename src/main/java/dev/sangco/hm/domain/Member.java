@@ -29,11 +29,8 @@ public class Member extends BaseTimeEntity {
     public Member(String userId, String amount) {
         this.userId = userId;
         this.account = new Account(amount);
-    }
-
-    public void generateExternalId() {
         Random random = new Random();
-        random.setSeed(this.id);
+        random.setSeed(System.currentTimeMillis());
         this.externalId = Math.abs(random.nextLong());
     }
 

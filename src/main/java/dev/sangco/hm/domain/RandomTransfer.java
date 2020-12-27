@@ -29,7 +29,7 @@ public class RandomTransfer extends BaseTimeEntity {
 
     private BigDecimal totalAmount;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "random_transfer_id")
     private List<RandomTransferReceiver> receivers = new ArrayList<>();
 

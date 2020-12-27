@@ -22,6 +22,7 @@ public class RandomTransferService {
         return savedRandomTransfer.getId();
     }
 
+
     public RandomTransfer findOne(Long randomTransferId) {
         return randomTransferRepository.getOne(randomTransferId);
     }

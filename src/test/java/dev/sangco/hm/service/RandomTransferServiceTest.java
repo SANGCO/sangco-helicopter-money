@@ -21,6 +21,12 @@ public class RandomTransferServiceTest {
 
     @Test
     public void saveRandomTransferTest() {
+        // Given
+
+        // When
+
+        // Then
+
         RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()
                 .totalCount(5)
                 .totalAmount("10000")
