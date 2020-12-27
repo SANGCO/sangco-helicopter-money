@@ -23,6 +23,7 @@ public class RandomTransferController {
         requestDto.addHeaders(xUserId, xRoomId);
         Long randomTransferId = randomTransferService.saveRandomTransfer(requestDto);
         RandomTransfer randomTransfer = randomTransferService.findOne(randomTransferId);
+        // TODO 토큰 헤더에 담아서 리턴
         return new ResponseEntity<>(OK);
     }
 

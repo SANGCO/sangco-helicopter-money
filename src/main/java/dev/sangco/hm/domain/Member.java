@@ -3,8 +3,8 @@ package dev.sangco.hm.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
+import java.util.Random;
 
 @Entity
 @Getter
@@ -16,14 +16,25 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
+    @Column(unique = true)
     private String userId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @Column(unique = true)
+    private Long externalId;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
     @JoinColumn(name = "account_id")
     private Account account;
 
-    public Member(String userId) {
+    public Member(String userId, String amount) {
         this.userId = userId;
+        this.account = new Account(amount);
+    }
+
+    public void generateExternalId() {
+        Random random = new Random();
+        random.setSeed(this.id);
+        this.externalId = Math.abs(random.nextLong());
     }
 
 }
