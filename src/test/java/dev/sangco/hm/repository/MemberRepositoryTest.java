@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -22,12 +21,20 @@ public class MemberRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
 
+    private Member member;
+    private Member savedMember;
+    private Optional<Member> findMember;
+
+    @Before
+    public void setup() {
+        member = new Member("test1234", "100000");
+        savedMember = memberRepository.save(member);
+        findMember = memberRepository.findById(savedMember.getId());
+    }
+
     @Test
     public void testMember() {
         // Given
-        Member member = new Member("test1234", "100000");
-        Member savedMember = memberRepository.save(member);
-        Optional<Member> findMember = memberRepository.findById(savedMember.getId());
 
         // When
 
@@ -38,6 +45,17 @@ public class MemberRepositoryTest {
         assertThat(findMember.get().getAccount()).isEqualTo(member.getAccount());
         assertThat(member.getAccount().getAmount()).isEqualTo(new BigDecimal("100000"));
         assertThat(findMember.get().getExternalId()).isEqualTo(member.getExternalId());
+    }
+
+    @Test
+    public void findByExternalIdTest() {
+        // Given
+        findMember = memberRepository.findByExternalId(savedMember.getExternalId());
+
+        // When
+
+        // Then
+        assertThat(findMember.isPresent()).isTrue();
     }
 
 }

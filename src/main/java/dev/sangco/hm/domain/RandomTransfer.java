@@ -25,7 +25,7 @@ public class RandomTransfer extends BaseTimeEntity {
     private String token;
 
     @OneToOne(fetch = FetchType.LAZY)
-    private Member owner;
+    private Member member;
 
     @OneToOne(fetch = FetchType.LAZY)
     private GroupChat groupChat;
@@ -38,12 +38,12 @@ public class RandomTransfer extends BaseTimeEntity {
     @JoinColumn(name = "random_transfer_id")
     private List<RandomTransferReceiver> receivers = new ArrayList<>();
 
-    public RandomTransfer(Member owner, GroupChat groupChat,
-                          int totalCount, BigDecimal totalAmount) {
-        this.owner = owner;
+    public RandomTransfer(Member member, GroupChat groupChat,
+                          int totalCount, String totalAmount) {
+        this.member = member;
         this.groupChat = groupChat;
         this.totalCount = totalCount;
-        this.totalAmount = totalAmount;
+        this.totalAmount = new BigDecimal(totalAmount);
         addRecievers();
     }
 
@@ -60,6 +60,10 @@ public class RandomTransfer extends BaseTimeEntity {
         }
 
         return stringBuilder.toString();
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     // TODO 분배 로직

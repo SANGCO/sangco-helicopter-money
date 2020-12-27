@@ -27,6 +27,8 @@ public class RandomTransferControllerTest {
     @Autowired
     RandomTransferService randomTransferService;
 
+    // TODO 토큰 생성된거도 체크
+
     @Test
     public void createRandomTransferTest() throws Exception {
         RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()

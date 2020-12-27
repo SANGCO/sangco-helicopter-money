@@ -34,7 +34,7 @@ public class RandomTransferHistory extends BaseTimeEntity {
 
     public RandomTransferHistory(RandomTransfer randomTransfer) {
         this.token = randomTransfer.getToken();
-        this.owner = randomTransfer.getOwner();
+        this.owner = randomTransfer.getMember();
         this.totalCount = randomTransfer.getTotalCount();
         this.totalAmount = randomTransfer.getTotalAmount();
         this.receivers = randomTransfer.getReceivers();
