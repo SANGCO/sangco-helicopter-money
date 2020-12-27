@@ -1,6 +1,7 @@
 package dev.sangco.hm.service;
 
 import dev.sangco.hm.domain.RandomTransfer;
+import dev.sangco.hm.web.dto.RandomTransferRequestDto;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +24,11 @@ public class RandomTransferServiceTest {
 
     @Test
     public void saveRandomTransferTest() {
-        Long id = randomTransferService.saveRandomTransfer(5, new BigDecimal("10000"));
+        RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()
+                .totalCount(5)
+                .totalAmount("10000")
+                .build();
+        Long id = randomTransferService.saveRandomTransfer(requestDto);
         RandomTransfer randomTransfer = randomTransferService.findOne(id);
         assertThat(randomTransfer.getReceivers().size()).isEqualTo(5);
     }

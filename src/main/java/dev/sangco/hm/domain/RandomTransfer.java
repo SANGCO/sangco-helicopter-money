@@ -3,6 +3,7 @@ package dev.sangco.hm.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,8 +20,10 @@ public class RandomTransfer extends BaseTimeEntity {
     private Long id;
 
     // TODO 토큰 생성 로직
-    @Column(unique = true)
     private String token;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Member owner;
 
     private int totalCount;
 
