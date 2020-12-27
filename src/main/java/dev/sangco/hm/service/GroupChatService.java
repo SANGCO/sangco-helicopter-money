@@ -19,8 +19,7 @@ public class GroupChatService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long saveGroupChat(List<Long> ids) {
-        List<Member> members = memberRepository.findAllById(ids);
+    public Long saveGroupChat(List<Member> members) {
         GroupChat groupChat = new GroupChat();
         groupChat.addMembers(members);
         GroupChat savedGroupChat = groupChatRepository.save(groupChat);

@@ -28,21 +28,24 @@ public class GroupChatServiceTest {
 
     @Test
     public void saveGroupChatTest() {
-        Member member1 = new Member("test1");
-        Member member2 = new Member("test2");
-        Member member3 = new Member("test3");
-        Member member4 = new Member("test4");
+        // Given
+        Member member1 = new Member("test1", "0");
+        Member member2 = new Member("test2", "0");
+        Member member3 = new Member("test3", "0");
+        Member member4 = new Member("test4", "0");
         memberRepository.save(member1);
         memberRepository.save(member2);
         memberRepository.save(member3);
         memberRepository.save(member4);
+        List<Member> members = Arrays.asList(member1, member2, member3, member4);
 
-        List<Long> ids = Arrays.asList(
-                member1.getId(), member2.getId(), member3.getId(), member4.getId());
-        long groupChatId = groupChatService.saveGroupChat(ids);
+        // When
+        long groupChatId = groupChatService.saveGroupChat(members);
         GroupChat groupChat = groupChatService.findOne(groupChatId);
 
+        // Then
         assertThat(groupChat.getMembers().size()).isEqualTo(4);
+        assertThat(groupChat.getExternalId()).isNotNull();
     }
 
 }

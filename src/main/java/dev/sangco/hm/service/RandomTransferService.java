@@ -15,6 +15,7 @@ public class RandomTransferService {
 
     private final RandomTransferRepository randomTransferRepository;
 
+    @Transactional
     public Long saveRandomTransfer(RandomTransferRequestDto requestDto) {
         RandomTransfer savedRandomTransfer = randomTransferRepository.save(
                 new RandomTransfer(requestDto.getTotalCount(), new BigDecimal(requestDto.getTotalAmount())));

@@ -23,7 +23,7 @@ public class HelicopterMoneyApplication {
 		return (args -> {
 			IntStream.rangeClosed(1, 10).forEach(i -> {
 				Member savedMember = memberRepository
-						.save(new Member("test" + i, "10000" + i));
+						.save(new Member("initData" + i, "10000" + i));
 				savedMember.generateExternalId();
 				memberRepository.save(savedMember);
 			});

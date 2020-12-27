@@ -1,12 +1,10 @@
 package dev.sangco.hm.domain;
 
+import com.fasterxml.uuid.Generators;
 import lombok.Getter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -17,15 +15,23 @@ public class GroupChat extends BaseTimeEntity {
     @Column(name = "group_chat_id")
     private Long id;
 
+    @Column(unique = true)
+    private String externalId;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "group_chat_member",
             joinColumns = @JoinColumn(name = "group_chat_id"),
             inverseJoinColumns = @JoinColumn(name = "member_id"))
     private Set<Member> members = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
     @JoinColumn(name = "group_chat_id")
     private List<ChatMessage> chatMessages = new ArrayList<>();
+
+    public GroupChat() {
+        this.externalId = Generators.timeBasedGenerator()
+                .generate().toString().replace("-", "");
+    }
 
     public void addMember(Member member) {
         this.members.add(member);
@@ -38,7 +44,5 @@ public class GroupChat extends BaseTimeEntity {
     public void addChatMessage(ChatMessage chatMessage) {
         this.chatMessages.add(chatMessage);
     }
-
-
 
 }
