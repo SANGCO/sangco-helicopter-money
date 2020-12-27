@@ -14,8 +14,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class RandomTransferService {
 
-    @Autowired
-    RandomTransferRepository randomTransferRepository;
+    private final RandomTransferRepository randomTransferRepository;
 
     public Long saveRandomTransfer(int totalCount, BigDecimal totalAmount) {
         RandomTransfer savedRandomTransfer = randomTransferRepository.save(

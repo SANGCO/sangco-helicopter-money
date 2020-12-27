@@ -16,11 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupChatService {
 
-    @Autowired
-    private GroupChatRepository groupChatRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
+    private final GroupChatRepository groupChatRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public Long saveGroupChat(List<Long> ids) {
