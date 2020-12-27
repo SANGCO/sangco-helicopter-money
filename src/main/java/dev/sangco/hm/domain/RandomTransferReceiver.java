@@ -22,10 +22,17 @@ public class RandomTransferReceiver extends BaseTimeEntity {
 
     private BigDecimal amount;
 
-    private Boolean isDone;
+    private Boolean isDone = false;
 
     public RandomTransferReceiver(BigDecimal amount) {
         this.amount = amount;
     }
 
+    public void setDone(Boolean done) {
+        isDone = done;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
 }

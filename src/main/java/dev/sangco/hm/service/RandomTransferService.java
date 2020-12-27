@@ -3,6 +3,7 @@ package dev.sangco.hm.service;
 import dev.sangco.hm.domain.GroupChat;
 import dev.sangco.hm.domain.Member;
 import dev.sangco.hm.domain.RandomTransfer;
+import dev.sangco.hm.domain.RandomTransferReceiver;
 import dev.sangco.hm.repository.GroupChatRepository;
 import dev.sangco.hm.repository.MemberRepository;
 import dev.sangco.hm.repository.RandomTransferRepository;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -49,6 +52,63 @@ public class RandomTransferService {
 
     public Optional<RandomTransfer> findOne(Long randomTransferId) {
         return randomTransferRepository.findById(randomTransferId);
+    }
+
+    public void checkTransferRequest(RandomTransferRequestDto requestDto) throws Exception {
+        Member member = memberRepository.findByExternalId(requestDto.getXUserId())
+                .orElseThrow(IllegalAccessException::new);
+        GroupChat groupChat = groupChatRepository.findByExternalId(requestDto.getXRoomId())
+                .orElseThrow(IllegalAccessException::new);
+        boolean exist = randomTransferRepository.existsByMemberAndGroupChatAndToken(
+                member, groupChat, requestDto.getXRandomToken());
+        if (!exist) {
+            throw new IllegalAccessException();
+        }
+
+        RandomTransfer randomTransfer = randomTransferRepository.findByMemberAndGroupChatAndToken(
+                member, groupChat, requestDto.getXRandomToken())
+                .orElseThrow(IllegalAccessException::new);
+        if (randomTransfer.getMember().equals(member)) {
+            throw new IllegalAccessException();
+        }
+
+        List<RandomTransferReceiver> receivers = randomTransfer.getReceivers();
+        for (RandomTransferReceiver randomTransferReceiver : receivers) {
+            if (randomTransferReceiver.getMember().equals(member)) {
+                throw new IllegalAccessException();
+            }
+        }
+    }
+
+    public RandomTransferReceiver transferOne(RandomTransferRequestDto requestDto) throws Exception {
+        Member member = memberRepository.findByExternalId(requestDto.getXUserId())
+                .orElseThrow(IllegalAccessException::new);
+        GroupChat groupChat = groupChatRepository.findByExternalId(requestDto.getXRoomId())
+                .orElseThrow(IllegalAccessException::new);
+        RandomTransfer randomTransfer = randomTransferRepository
+                .findByGroupChatAndToken(groupChat, requestDto.getXRandomToken())
+                .orElseThrow(IllegalAccessException::new);
+        if (LocalDateTime.now().isAfter(randomTransfer.getCreatedDate().plusMinutes(10L))) {
+            randomTransfer.setActive(false);
+            throw new IllegalAccessException();
+        }
+
+        RandomTransferReceiver randomTransferReceiver = null;
+        for (RandomTransferReceiver r : randomTransfer.getReceivers()) {
+            if (!r.getIsDone()) {
+                r.setDone(true);
+                r.setMember(member);
+                randomTransferReceiver = r;
+                break;
+            }
+        }
+
+        if (randomTransferReceiver == null) {
+            randomTransfer.setActive(false);
+            throw new IllegalAccessException();
+        }
+
+        return randomTransferReceiver;
     }
 
 }

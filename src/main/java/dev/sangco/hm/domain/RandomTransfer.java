@@ -80,4 +80,7 @@ public class RandomTransfer extends BaseTimeEntity {
         receivers.add(new RandomTransferReceiver(new BigDecimal(totalAmount)));
     }
 
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
 }
