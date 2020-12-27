@@ -15,8 +15,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +37,6 @@ public class RandomTransferControllerTest {
     @Autowired
     GroupChatRepository groupChatRepository;
 
-    // TODO 분배 로직 테스트
     @Test
     public void createRandomTransferTest() throws Exception {
         // Given
@@ -63,6 +60,7 @@ public class RandomTransferControllerTest {
         // Then
         assertThat(responseEntity.getStatusCode()).isEqualTo(OK);
         assertThat(responseEntity.getHeaders().containsKey("X-RANDOM-TOKEN")).isTrue();
+
     }
 
 }

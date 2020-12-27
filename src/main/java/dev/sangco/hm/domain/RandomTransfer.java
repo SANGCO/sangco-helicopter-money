@@ -68,12 +68,16 @@ public class RandomTransfer extends BaseTimeEntity {
         this.token = token;
     }
 
-    // TODO 분배 로직
     void addRecievers() {
-        for (int i = 1; i <= totalCount; i++) {
-            receivers.add(new RandomTransferReceiver(
-                    totalAmount.divide(new BigDecimal(totalCount))));
+        int totalAmount = this.totalAmount.intValue();
+        Random random = new Random();
+        for (int i = 1; i < totalCount; i++) {
+            int temp = random.nextInt(totalAmount + 1);
+            totalAmount = totalAmount - temp;
+            receivers.add(new RandomTransferReceiver(new BigDecimal(temp)));
         }
+
+        receivers.add(new RandomTransferReceiver(new BigDecimal(totalAmount)));
     }
 
 }

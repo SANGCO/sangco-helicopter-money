@@ -22,6 +22,8 @@ public class RandomTransferReceiver extends BaseTimeEntity {
 
     private BigDecimal amount;
 
+    private Boolean isDone;
+
     public RandomTransferReceiver(BigDecimal amount) {
         this.amount = amount;
     }
