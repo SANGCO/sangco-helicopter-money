@@ -3,18 +3,17 @@ package dev.sangco.hm.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class RandomTransferReceiver extends BaseTimeEntity {
+public class RandomTransferReceiverHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "random_transfer_receiver_id")
+    @Column(name = "random_transfer_receiver_history_id")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -22,8 +21,8 @@ public class RandomTransferReceiver extends BaseTimeEntity {
 
     private BigDecimal amount;
 
-    public RandomTransferReceiver(BigDecimal amount) {
-        this.amount = amount;
+    public RandomTransferReceiverHistory(RandomTransferReceiver randomTransferReceiver) {
+        this.member = randomTransferReceiver.getMember();
+        this.amount = randomTransferReceiver.getAmount();
     }
-
 }

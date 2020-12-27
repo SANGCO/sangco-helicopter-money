@@ -17,9 +17,14 @@ public class RandomTransferService {
 
     @Transactional
     public Long saveRandomTransfer(RandomTransferRequestDto requestDto) {
-        RandomTransfer savedRandomTransfer = randomTransferRepository.save(
-                new RandomTransfer(requestDto.getTotalCount(), new BigDecimal(requestDto.getTotalAmount())));
-        return savedRandomTransfer.getId();
+
+
+//        new RandomTransfer(requestDto.getTotalCount(), new BigDecimal(requestDto.getTotalAmount()))
+
+
+//        RandomTransfer savedRandomTransfer = randomTransferRepository.save();
+//        return savedRandomTransfer.getId();
+        return 0L;
     }
 
 
