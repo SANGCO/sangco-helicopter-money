@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -30,10 +29,15 @@ public class RandomTransferService {
         GroupChat groupChat = groupChatRepository.findByExternalId(requestDto.getXRoomId())
                 .orElseThrow(IllegalArgumentException::new);
 
-        RandomTransfer randomTransfer = new RandomTransfer(member, groupChat,
-                requestDto.getTotalCount(), requestDto.getTotalAmount());
+        RandomTransfer randomTransfer = RandomTransfer.builder()
+                .member(member)
+                .groupChat(groupChat)
+                .totalCount(requestDto.getTotalCount())
+                .totalAmount(requestDto.getTotalAmount())
+                .build();
+
         String token = randomTransfer.generateToken();
-        if (!randomTransferRepository.existsByMemberAndGroupChatAndToken(
+        if (randomTransferRepository.existsByMemberAndGroupChatAndToken(
                 member, groupChat, token)) {
             throw new IllegalStateException();
         }
@@ -43,9 +47,8 @@ public class RandomTransferService {
         return savedRandomTransfer.getId();
     }
 
-
-    public RandomTransfer findOne(Long randomTransferId) {
-        return randomTransferRepository.getOne(randomTransferId);
+    public Optional<RandomTransfer> findOne(Long randomTransferId) {
+        return randomTransferRepository.findById(randomTransferId);
     }
 
 }

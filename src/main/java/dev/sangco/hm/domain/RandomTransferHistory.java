@@ -9,9 +9,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Getter
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+//@Entity
+//@Getter
+//@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class RandomTransferHistory extends BaseTimeEntity {
 
     @Id

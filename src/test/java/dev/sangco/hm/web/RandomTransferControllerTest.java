@@ -1,5 +1,9 @@
 package dev.sangco.hm.web;
 
+import dev.sangco.hm.domain.GroupChat;
+import dev.sangco.hm.domain.Member;
+import dev.sangco.hm.repository.GroupChatRepository;
+import dev.sangco.hm.repository.MemberRepository;
 import dev.sangco.hm.service.RandomTransferService;
 import dev.sangco.hm.web.dto.RandomTransferRequestDto;
 import org.junit.Test;
@@ -12,6 +16,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.POST;
@@ -27,25 +33,36 @@ public class RandomTransferControllerTest {
     @Autowired
     RandomTransferService randomTransferService;
 
-    // TODO 토큰 생성된거도 체크
+    @Autowired
+    MemberRepository memberRepository;
 
+    @Autowired
+    GroupChatRepository groupChatRepository;
+
+    // TODO 분배 로직 테스트
     @Test
     public void createRandomTransferTest() throws Exception {
+        // Given
+        List<Member> members = memberRepository.findAll();
+        List<GroupChat> groupChats = groupChatRepository.findAll();
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-USER-ID", Long.toString(members.get(0).getExternalId()));
+        httpHeaders.add("X-ROOM-ID", groupChats.get(0).getExternalId());
+
         RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()
                 .totalCount(5)
                 .totalAmount("10000")
                 .build();
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("X-USER-ID", "5128016860359238732");
-        httpHeaders.add("X-ROOM-ID", "ce344d92da9d4cf0b57f956558fc17a4");
-
         HttpEntity<RandomTransferRequestDto> httpEntity = new HttpEntity<>(requestDto, httpHeaders);
 
-        ResponseEntity<ResponseEntity> responseEntity = template
-                .exchange("/random/transfers", POST, httpEntity, ResponseEntity.class);
+        // When
+        ResponseEntity<String> responseEntity = template
+                .exchange("/random/transfers", POST, httpEntity, String.class);
 
+        // Then
         assertThat(responseEntity.getStatusCode()).isEqualTo(OK);
+        assertThat(responseEntity.getHeaders().containsKey("X-RANDOM-TOKEN")).isTrue();
     }
 
 }

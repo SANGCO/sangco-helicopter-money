@@ -32,8 +32,12 @@ public class RandomTransferRepositoryTest {
         // Given
         List<Member> members = memberRepository.findAll();
         List<GroupChat> groupChats = groupChatRepository.findAll();
-        RandomTransfer randomTransfer = new RandomTransfer(
-                members.get(0), groupChats.get(0), 5, "10000");
+        RandomTransfer randomTransfer = RandomTransfer.builder()
+                .member(members.get(0))
+                .groupChat(groupChats.get(0))
+                .totalCount(5)
+                .totalAmount("100000")
+                .build();
         RandomTransfer savedRandomTransfer = randomTransferRepository.save(randomTransfer);
 
         // When

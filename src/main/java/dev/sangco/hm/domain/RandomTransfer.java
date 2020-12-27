@@ -1,6 +1,7 @@
 package dev.sangco.hm.domain;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
@@ -38,6 +39,7 @@ public class RandomTransfer extends BaseTimeEntity {
     @JoinColumn(name = "random_transfer_id")
     private List<RandomTransferReceiver> receivers = new ArrayList<>();
 
+    @Builder
     public RandomTransfer(Member member, GroupChat groupChat,
                           int totalCount, String totalAmount) {
         this.member = member;

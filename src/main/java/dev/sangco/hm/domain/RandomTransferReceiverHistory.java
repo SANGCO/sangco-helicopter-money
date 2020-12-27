@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.math.BigDecimal;
 
-@Entity
-@Getter
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+//@Entity
+//@Getter
+//@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class RandomTransferReceiverHistory extends BaseTimeEntity {
 
     @Id
