@@ -1,0 +1,44 @@
+package dev.sangco.hm.domain;
+
+import lombok.Getter;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Entity
+@Getter
+public class GroupChat extends BaseTimeEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "group_chat_id")
+    private Long id;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "group_chat_member",
+            joinColumns = @JoinColumn(name = "group_chat_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_id"))
+    private Set<Member> members = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_chat_id")
+    private List<ChatMessage> chatMessages = new ArrayList<>();
+
+    public void addMember(Member member) {
+        this.members.add(member);
+    }
+
+    public void addMembers(List<Member> members) {
+        this.members.addAll(members);
+    }
+
+    public void addChatMessage(ChatMessage chatMessage) {
+        this.chatMessages.add(chatMessage);
+    }
+
+
+
+}
