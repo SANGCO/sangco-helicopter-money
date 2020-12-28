@@ -4,6 +4,8 @@ import dev.sangco.hm.domain.RandomTransfer;
 import dev.sangco.hm.domain.RandomTransferReceiver;
 import dev.sangco.hm.service.RandomTransferService;
 import dev.sangco.hm.web.dto.RandomTransferRequestDto;
+import dev.sangco.hm.web.dto.RandomTransferResponseDto;
+import dev.sangco.hm.web.dto.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -40,19 +42,20 @@ public class RandomTransferController {
                 .build();
         randomTransferService.checkTransferRequest(requestDto);
         RandomTransferReceiver randomTransferReceiver = randomTransferService.transferOne(requestDto);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        return ResponseEntity.ok().headers(httpHeaders).body(randomTransferReceiver.getAmount());
+        return ResponseEntity.ok().body(randomTransferReceiver.getAmount());
     }
 
     @GetMapping
-    public ResponseEntity getRandomTransfer(@RequestHeader(name = "X-USER-ID") Long xUserId,
-                                                      @RequestHeader(name = "X-ROOM-ID") String xRoomId,
-                                                      @RequestHeader(name = "X-RANDOM-TOKEN") String xRandomToken) {
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        return ResponseEntity.ok().headers(httpHeaders).build();
+    public ResponseEntity<Result<RandomTransferResponseDto>> getRandomTransfer(@RequestHeader(name = "X-USER-ID") Long xUserId,
+                                                                               @RequestHeader(name = "X-ROOM-ID") String xRoomId,
+                                                                               @RequestHeader(name = "X-RANDOM-TOKEN") String xRandomToken) throws Exception {
+        RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()
+                .xUserId(xUserId)
+                .xRoomId(xRoomId)
+                .xRandomToken(xRandomToken)
+                .build();
+        RandomTransfer randomTransfer = randomTransferService.findOne(requestDto);
+        return ResponseEntity.ok().body(new Result<>(new RandomTransferResponseDto(randomTransfer)));
     }
-
-
 
 }

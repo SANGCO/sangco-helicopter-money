@@ -54,6 +54,19 @@ public class RandomTransferService {
         return randomTransferRepository.findById(randomTransferId);
     }
 
+    public RandomTransfer findOne(RandomTransferRequestDto requestDto) throws Exception {
+        Member member = memberRepository.findByExternalId(requestDto.getXUserId())
+                .orElseThrow(IllegalArgumentException::new);
+        GroupChat groupChat = groupChatRepository.findByExternalId(requestDto.getXRoomId())
+                .orElseThrow(IllegalArgumentException::new);
+
+        RandomTransfer randomTransfer = randomTransferRepository
+                .findByMemberAndGroupChatAndTokenAndCreatedDateAfter(
+                        member, groupChat, requestDto.getXRandomToken(), LocalDateTime.now().minusDays(7))
+                .orElseThrow(IllegalArgumentException::new);;
+        return randomTransfer;
+    }
+
     public void checkTransferRequest(RandomTransferRequestDto requestDto) throws Exception {
         Member member = memberRepository.findByExternalId(requestDto.getXUserId())
                 .orElseThrow(IllegalAccessException::new);

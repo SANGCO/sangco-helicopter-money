@@ -17,7 +17,7 @@ public class RandomTransferReceiver extends BaseTimeEntity {
     @Column(name = "random_transfer_receiver_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     private Member member;
 
     private BigDecimal amount;

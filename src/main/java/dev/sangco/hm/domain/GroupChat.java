@@ -4,7 +4,10 @@ import com.fasterxml.uuid.Generators;
 import lombok.Getter;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
