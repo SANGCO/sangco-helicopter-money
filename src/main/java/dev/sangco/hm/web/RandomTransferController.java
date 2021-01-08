@@ -40,6 +40,8 @@ public class RandomTransferController {
                 .xRoomId(xRoomId)
                 .xRandomToken(xRandomToken)
                 .build();
+        // TODO checkTransferRequest() 여기서 RandomTransfer 리턴 받아서 유효한 RandomTransfer를 transferOne()에 넘기는 식으로
+        // TODO 메서드 명도 유효한 RandomTransfer를 가지고 온다?
         randomTransferService.checkTransferRequest(requestDto);
         RandomTransferReceiver randomTransferReceiver = randomTransferService.transferOne(requestDto);
         return ResponseEntity.ok().body(randomTransferReceiver.getAmount());
@@ -55,6 +57,7 @@ public class RandomTransferController {
                 .xRandomToken(xRandomToken)
                 .build();
         RandomTransfer randomTransfer = randomTransferService.findOne(requestDto);
+        // TODO 테스트 코드 짜서 이거 API 나오는거 체크
         return ResponseEntity.ok().body(new Result<>(new RandomTransferResponseDto(randomTransfer)));
     }
 

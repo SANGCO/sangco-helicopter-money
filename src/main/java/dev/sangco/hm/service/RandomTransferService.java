@@ -85,6 +85,7 @@ public class RandomTransferService {
             throw new IllegalAccessException();
         }
 
+        // TODO RandomTransfer로 옮기는게 좋을거 같은데
         List<RandomTransferReceiver> receivers = randomTransfer.getReceivers();
         for (RandomTransferReceiver randomTransferReceiver : receivers) {
             if (randomTransferReceiver.getMember().equals(member)) {
@@ -93,6 +94,7 @@ public class RandomTransferService {
         }
     }
 
+    @Transactional
     public RandomTransferReceiver transferOne(RandomTransferRequestDto requestDto) throws Exception {
         Member member = memberRepository.findByExternalId(requestDto.getXUserId())
                 .orElseThrow(IllegalAccessException::new);
@@ -101,8 +103,11 @@ public class RandomTransferService {
         RandomTransfer randomTransfer = randomTransferRepository
                 .findByGroupChatAndToken(groupChat, requestDto.getXRandomToken())
                 .orElseThrow(IllegalAccessException::new);
+        // TODO 여기서 isActive 부터 체크해야 할거 같은데
+
         if (LocalDateTime.now().isAfter(randomTransfer.getCreatedDate().plusMinutes(10L))) {
             randomTransfer.setActive(false);
+            // TODO 익셉션 던지면 이거 저장이 되나?
             throw new IllegalAccessException();
         }
 
@@ -118,6 +123,7 @@ public class RandomTransferService {
 
         if (randomTransferReceiver == null) {
             randomTransfer.setActive(false);
+            // TODO 여기도 이거 저장되나?
             throw new IllegalAccessException();
         }
 
