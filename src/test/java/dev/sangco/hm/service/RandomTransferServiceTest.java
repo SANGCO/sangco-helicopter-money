@@ -7,6 +7,7 @@ import dev.sangco.hm.domain.RandomTransferReceiver;
 import dev.sangco.hm.repository.GroupChatRepository;
 import dev.sangco.hm.repository.MemberRepository;
 import dev.sangco.hm.web.dto.RandomTransferRequestDto;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,22 +35,28 @@ public class RandomTransferServiceTest {
     @Autowired
     GroupChatRepository groupChatRepository;
 
-    @Test
-    public void saveRandomTransferTest() {
-        // Given
+    private Optional<RandomTransfer> randomTransfer;
+
+    @Before
+    public void setup() {
         List<Member> members = memberRepository.findAll();
         List<GroupChat> groupChats = groupChatRepository.findAll();
 
         RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()
-                .totalCount(5)
-                .totalAmount("10000")
-                .build();
+            .totalCount(5)
+            .totalAmount("10000")
+            .build();
         requestDto.addHeaders(members.get(0).getExternalId(),
-                              groupChats.get(0).getExternalId());
+                groupChats.get(0).getExternalId());
         Long id = randomTransferService.saveRandomTransfer(requestDto);
+        randomTransfer = randomTransferService.findOne(id);
+    }
+
+    @Test
+    public void saveRandomTransferTest() {
+        // Given
 
         // When
-        Optional<RandomTransfer> randomTransfer = randomTransferService.findOne(id);
 
         // Then
         assertThat(randomTransfer.isPresent()).isTrue();
@@ -59,19 +66,8 @@ public class RandomTransferServiceTest {
     @Test
     public void addRecieversTest() {
         // Given
-        List<Member> members = memberRepository.findAll();
-        List<GroupChat> groupChats = groupChatRepository.findAll();
-
-        RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()
-                .totalCount(5)
-                .totalAmount("10000")
-                .build();
-        requestDto.addHeaders(members.get(0).getExternalId(),
-                groupChats.get(0).getExternalId());
-        Long id = randomTransferService.saveRandomTransfer(requestDto);
 
         // When
-        Optional<RandomTransfer> randomTransfer = randomTransferService.findOne(id);
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (RandomTransferReceiver r : randomTransfer.get().getReceivers()) {
             totalAmount = totalAmount.add(r.getAmount());
@@ -79,6 +75,30 @@ public class RandomTransferServiceTest {
 
         // Then
         assertThat(randomTransfer.get().getTotalAmount()).isEqualTo(totalAmount);
+    }
+
+    @Test
+    public void transferOneTest() throws Exception {
+        // Given
+
+        // When
+        RandomTransfer randomTransfer = this.randomTransfer.get();
+        for (RandomTransferReceiver receiver : randomTransfer.getReceivers()) {
+            receiver.setDone(true);
+            receiver.setMember(randomTransfer.getMember());
+        }
+
+        RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()
+                .xUserId(randomTransfer.getMember().getExternalId())
+                .xRoomId(randomTransfer.getGroupChat().getExternalId())
+                .xRandomToken(randomTransfer.getToken()).build();
+
+        // Then
+        try {
+            randomTransferService.transferOne(requestDto);
+        } catch (IllegalAccessException ex) {
+            assertThat(randomTransfer.getIsActive()).isFalse();
+        }
     }
 
 }

@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @Getter
@@ -47,7 +46,7 @@ public class RandomTransfer extends BaseTimeEntity {
         this.groupChat = groupChat;
         this.totalCount = totalCount;
         this.totalAmount = new BigDecimal(totalAmount);
-        addRecievers();
+        addReceivers();
     }
 
     public String generateToken() {
@@ -69,7 +68,7 @@ public class RandomTransfer extends BaseTimeEntity {
         this.token = token;
     }
 
-    void addRecievers() {
+    void addReceivers() {
         int totalAmount = this.totalAmount.intValue();
         Random random = new Random();
         for (int i = 1; i < totalCount; i++) {
@@ -79,6 +78,38 @@ public class RandomTransfer extends BaseTimeEntity {
         }
 
         receivers.add(new RandomTransferReceiver(new BigDecimal(totalAmount)));
+    }
+
+    public boolean checkReceiversMember(Member member) {
+        for (RandomTransferReceiver randomTransferReceiver : receivers) {
+            if (randomTransferReceiver.getMember() != null) {
+                return !Objects.equals(randomTransferReceiver.getMember(), member);
+            }
+        }
+
+        return true;
+    }
+
+    public boolean isExpired() {
+        if (LocalDateTime.now().isAfter(getCreatedDate().plusMinutes(10L))) {
+            setActive(false);
+            return true;
+        }
+
+        return false;
+    }
+
+    public Optional<RandomTransferReceiver> spreadOne() {
+        for (RandomTransferReceiver r : getReceivers()) {
+            if (!r.getIsDone()) {
+                r.setDone(true);
+                r.setMember(member);
+                return Optional.of(r);
+            }
+        }
+
+        setActive(false);
+        return Optional.empty();
     }
 
     public void setActive(Boolean active) {

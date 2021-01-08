@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,33 +66,6 @@ public class RandomTransferService {
         return randomTransfer;
     }
 
-    public void checkTransferRequest(RandomTransferRequestDto requestDto) throws Exception {
-        Member member = memberRepository.findByExternalId(requestDto.getXUserId())
-                .orElseThrow(IllegalAccessException::new);
-        GroupChat groupChat = groupChatRepository.findByExternalId(requestDto.getXRoomId())
-                .orElseThrow(IllegalAccessException::new);
-        boolean exist = randomTransferRepository.existsByMemberAndGroupChatAndToken(
-                member, groupChat, requestDto.getXRandomToken());
-        if (!exist) {
-            throw new IllegalAccessException();
-        }
-
-        RandomTransfer randomTransfer = randomTransferRepository.findByMemberAndGroupChatAndToken(
-                member, groupChat, requestDto.getXRandomToken())
-                .orElseThrow(IllegalAccessException::new);
-        if (randomTransfer.getMember().equals(member)) {
-            throw new IllegalAccessException();
-        }
-
-        // TODO RandomTransfer로 옮기는게 좋을거 같은데
-        List<RandomTransferReceiver> receivers = randomTransfer.getReceivers();
-        for (RandomTransferReceiver randomTransferReceiver : receivers) {
-            if (randomTransferReceiver.getMember().equals(member)) {
-                throw new IllegalAccessException();
-            }
-        }
-    }
-
     @Transactional
     public RandomTransferReceiver transferOne(RandomTransferRequestDto requestDto) throws Exception {
         Member member = memberRepository.findByExternalId(requestDto.getXUserId())
@@ -103,31 +75,16 @@ public class RandomTransferService {
         RandomTransfer randomTransfer = randomTransferRepository
                 .findByGroupChatAndToken(groupChat, requestDto.getXRandomToken())
                 .orElseThrow(IllegalAccessException::new);
-        // TODO 여기서 isActive 부터 체크해야 할거 같은데
 
-        if (LocalDateTime.now().isAfter(randomTransfer.getCreatedDate().plusMinutes(10L))) {
-            randomTransfer.setActive(false);
-            // TODO 익셉션 던지면 이거 저장이 되나?
+        if (!randomTransfer.checkReceiversMember(member) || !randomTransfer.getIsActive()) {
+            throw new IllegalStateException();
+        }
+
+        if (randomTransfer.isExpired()) {
             throw new IllegalAccessException();
         }
 
-        RandomTransferReceiver randomTransferReceiver = null;
-        for (RandomTransferReceiver r : randomTransfer.getReceivers()) {
-            if (!r.getIsDone()) {
-                r.setDone(true);
-                r.setMember(member);
-                randomTransferReceiver = r;
-                break;
-            }
-        }
-
-        if (randomTransferReceiver == null) {
-            randomTransfer.setActive(false);
-            // TODO 여기도 이거 저장되나?
-            throw new IllegalAccessException();
-        }
-
-        return randomTransferReceiver;
+        return randomTransfer.spreadOne().orElseThrow(IllegalAccessException::new);
     }
 
 }
