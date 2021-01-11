@@ -7,6 +7,8 @@ import dev.sangco.hm.repository.GroupChatRepository;
 import dev.sangco.hm.repository.MemberRepository;
 import dev.sangco.hm.repository.RandomTransferReceiverRepository;
 import dev.sangco.hm.web.dto.RandomTransferRequestDto;
+import dev.sangco.hm.web.dto.RandomTransferResponseDto;
+import dev.sangco.hm.web.dto.Result;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -104,6 +107,52 @@ public class RandomTransferControllerTest {
         assertThat(createResponseEntity.getStatusCode()).isEqualTo(OK);
         assertThat(createResponseEntity.getHeaders().containsKey("X-RANDOM-TOKEN")).isTrue();
         assertThat(applyResponseEntity.getBody()).isEqualTo(amount.toString());
+    }
+
+    @Test
+    public void getRandomTransferTest() throws Exception {
+        // Given
+        List<Member> members = memberRepository.findAll();
+        List<GroupChat> groupChats = groupChatRepository.findAll();
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-USER-ID", Long.toString(members.get(0).getExternalId()));
+        httpHeaders.add("X-ROOM-ID", groupChats.get(0).getExternalId());
+
+        RandomTransferRequestDto requestDto = RandomTransferRequestDto.builder()
+                .totalCount(5)
+                .totalAmount("10000")
+                .build();
+        HttpEntity<RandomTransferRequestDto> httpEntity = new HttpEntity<>(requestDto, httpHeaders);
+        ResponseEntity<String> createResponseEntity = template
+                .exchange("/random/transfers", POST, httpEntity, String.class);
+
+        HttpHeaders applyHttpHeaders = new HttpHeaders();
+        applyHttpHeaders.add("X-USER-ID", Long.toString(members.get(1).getExternalId()));
+        applyHttpHeaders.add("X-ROOM-ID", groupChats.get(0).getExternalId());
+        applyHttpHeaders.add("X-RANDOM-TOKEN", Objects.requireNonNull(createResponseEntity.getHeaders().get("X-RANDOM-TOKEN")).get(0));
+        HttpEntity applyHttpEntity = new HttpEntity<>(applyHttpHeaders);
+        template.exchange("/random/transfers/apply", POST, applyHttpEntity, String.class);
+
+        HttpHeaders getHttpHeaders = new HttpHeaders();
+        getHttpHeaders.add("X-USER-ID", Long.toString(members.get(0).getExternalId()));
+        getHttpHeaders.add("X-ROOM-ID", groupChats.get(0).getExternalId());
+        getHttpHeaders.add("X-RANDOM-TOKEN", Objects.requireNonNull(createResponseEntity.getHeaders().get("X-RANDOM-TOKEN")).get(0));
+        HttpEntity getHttpEntity = new HttpEntity<>(getHttpHeaders);
+
+        // When
+        RandomTransferResponseDto randomTransferResponseDto = (RandomTransferResponseDto) template
+                .getForObject("/random/transfers", Result.class).getData();
+
+        BigDecimal amount = BigDecimal.ZERO;
+        for (RandomTransferReceiver r : randomTransferReceiverRepository.findAll()) {
+            if (r.getMember() != null) {
+                amount = r.getAmount();
+            }
+        }
+
+        // Then
+        assertThat(randomTransferResponseDto.getReceivedAmount()).isEqualTo(amount.toString());
     }
 
 }

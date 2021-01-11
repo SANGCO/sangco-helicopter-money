@@ -76,12 +76,10 @@ public class RandomTransferService {
                 .findByGroupChatAndToken(groupChat, requestDto.getXRandomToken())
                 .orElseThrow(IllegalAccessException::new);
 
-        if (!randomTransfer.checkReceiversMember(member) || !randomTransfer.getIsActive()) {
+        if (!randomTransfer.checkReceiversMember(member) ||
+            !randomTransfer.getIsActive() ||
+            randomTransfer.isExpired()) {
             throw new IllegalStateException();
-        }
-
-        if (randomTransfer.isExpired()) {
-            throw new IllegalAccessException();
         }
 
         return randomTransfer.spreadOne().orElseThrow(IllegalAccessException::new);

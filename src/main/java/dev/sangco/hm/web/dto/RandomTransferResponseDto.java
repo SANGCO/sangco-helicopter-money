@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class RandomTransferResponseDto {
 
     private String receivedAmount;
 
-    private List<RandomTransferReceiverResponseDto> receivers;
+    private List<RandomTransferReceiverResponseDto> receivers = new ArrayList<>();
 
     public RandomTransferResponseDto(RandomTransfer randomTransfer) {
         this.dateTime = randomTransfer.getCreatedDate().toString();
@@ -27,7 +28,7 @@ public class RandomTransferResponseDto {
         for (RandomTransferReceiver receiver : randomTransfer.getReceivers()) {
             if (receiver.getIsDone()) {
                 receivers.add(new RandomTransferReceiverResponseDto(receiver));
-                temp.add(receiver.getAmount());
+                temp = temp.add(receiver.getAmount());
             }
         }
 
